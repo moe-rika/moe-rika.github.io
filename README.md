@@ -32,6 +32,6 @@ for i in range(len(karr)):
     filename = "data/dic/{}/{}/{}.txt".format(i & 0xF000, i & 0xF00, i & 0xFF)
     os.makedirs(os.path.dirname(filename), exist_ok=True)
     with open(filename, "w", encoding='utf-8') as f:
-        f.write(arr[i])
+        f.write(karr[i])
 
 ```
