@@ -59,7 +59,7 @@ for i in range(len(karr)):
             }
             let pad_view = concatTypedArrays(view, padarr)
             let str_arr = new Array(Math.round(pad_view.length/2))
-            document.getElementById('demo').innerHTML = ""
+            document.getElementById('text').innerHTML = ""
             for (var i = 0; i < pad_view.length; i += 2) {
                 await fetch("/data/dic/" + (pad_view[i] >> 4) + "/" + (pad_view[i] & 0xF) + "/" + pad_view[i + 1] + ".txt")
                     .then(a => a.text())
@@ -93,3 +93,74 @@ for i in range(len(karr)):
 </html>
 ```
 
+```
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script>
+        async function btn() {
+            const str = document.getElementById('data').value
+            const arr = str.trim().split(/\r?\n/);
+            arr.forEach((element, index) => {
+                arr[index] = element.slice(0, element.length - 1);
+            });
+            const flag = arr[arr.length - 1] === "======";
+            const len = arr.length - (flag ? 1 : 0);
+            let data = new Uint8Array(len * 2)
+            document.getElementById('text').innerHTML = ""
+            for (var i = 0; i < len; i++) {
+                await fetch("/data/" + arr[i][0] + "/" + arr[i][1] + "/" + arr[i] + ".txt")
+                    .then(response => {
+                        if (!response.ok) {
+                            return Promise.reject(response);
+                        }
+                        return response;
+                    }
+                    )
+                    .then(a => a.text())
+                    .then(a => 0 + a)
+                    .then(a => { data[i * 2] = a >> 8; data[i * 2 + 1] = a & 0xFF;})
+                    .catch(error => {
+                        if (typeof error.json === "function") {
+                            error.json().then(jsonError => {
+                                document.getElementById('text').innerHTML += arr[i] + "<br>";
+                                document.getElementById('text').innerHTML += ("Json error from API<br>");
+                                document.getElementById('text').innerHTML += (jsonError);
+                            }).catch(genericError => {
+                                document.getElementById('text').innerHTML += arr[i] + "<br>";
+                                document.getElementById('text').innerHTML += ("Generic error from API");
+                                document.getElementById('text').innerHTML += (error.statusText);
+                            });
+                        } else {
+                            document.getElementById('text').innerHTML += arr[i] + "<br>";
+                            document.getElementById('text').innerHTML += ("Fetch error");
+                            document.getElementById('text').innerHTML += (error);
+                        }
+                    });
+            }
+            if (flag) data = data.slice(0, len * 2 - 1);
+            const decoder = new TextDecoder();
+            const view = decoder.decode(data);
+            document.getElementById('text').innerHTML += view;
+        }
+    </script>
+</head>
+
+<body>
+
+    <h2>诗歌鉴赏</h2>
+    <textarea style="display:block;width:100%" id="data" rows="20"></textarea>
+    <button id="btn">Try it</button>
+    <script>
+        document.getElementById("btn").onclick = async () => {
+            await btn();
+        }
+    </script>
+    <div id="text"></div>
+
+</body>
+
+</html>
+```
