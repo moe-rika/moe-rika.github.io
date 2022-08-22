@@ -45,27 +45,34 @@ for i in range(len(karr)):
 <head>
     <meta charset="utf-8">
     <script>
-
-        function btn() {
+        async function btn() {
             const encoder = new TextEncoder()
             view = encoder.encode(document.getElementById('data').value)
-            console.log(view);
-            var pad = view.length % 2 ? 1 : 0
+            const flag = view.length % 2;
+            var pad = flag ? 1 : 0
             var padarr = new Uint8Array(pad)
-            function concatTypedArrays(a, b) { // a, b TypedArray of same type
+            function concatTypedArrays(a, b) {
                 var c = new (a.constructor)(a.length + b.length);
                 c.set(a, 0);
                 c.set(b, a.length);
                 return c;
             }
             let pad_view = concatTypedArrays(view, padarr)
+            let str_arr = new Array(Math.round(pad_view.length/2))
             document.getElementById('demo').innerHTML = ""
             for (var i = 0; i < pad_view.length; i += 2) {
-                fetch("/data/dic/" + (pad_view[i] >> 4) + "/" + (pad_view[i] & 0xF) + "/" + pad_view[i + 1] + ".txt")
+                await fetch("/data/dic/" + (pad_view[i] >> 4) + "/" + (pad_view[i] & 0xF) + "/" + pad_view[i + 1] + ".txt")
                     .then(a => a.text())
-                    .then(a => document.getElementById('demo').innerHTML += a + '。<br />')
+                    .then(a => str_arr[Math.round(i/2)] = a + "。");
+            }
+            document.getElementById('text').innerHTML = str_arr.join("<br />");
+            if(flag)
+            {
+                document.getElementById('text').innerHTML += "<br />======="
             }
         }
+
+
     </script>
 </head>
 
@@ -73,11 +80,13 @@ for i in range(len(karr)):
 
     <h2>吟诗一首</h2>
     <input type="text" id="data" name="data">
-    <button onclick="btn()">Try it</button>
-
-    <div id="demo"></div>
-
-
+    <button id="btn">Try it</button>
+    <script>
+        document.getElementById("btn").onclick=async ()=>{
+        await btn();
+    }
+    </script>
+    <div id="text"></div>
 
 </body>
 
