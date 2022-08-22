@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script>
+        async function btn() {
+            const encoder = new TextEncoder()
+            view = encoder.encode(document.getElementById('data').value)
+            const flag = view.length % 2;
+            var pad = flag ? 1 : 0
+            var padarr = new Uint8Array(pad)
+            function concatTypedArrays(a, b) {
+                var c = new (a.constructor)(a.length + b.length);
+                c.set(a, 0);
+                c.set(b, a.length);
+                return c;
+            }
+            let pad_view = concatTypedArrays(view, padarr)
+            let str_arr = new Array(Math.round(pad_view.length/2))
+            document.getElementById('text').innerHTML = ""
+            for (var i = 0; i < pad_view.length; i += 2) {
+                await fetch("/data/dic/" + (pad_view[i] >> 4) + "/" + (pad_view[i] & 0xF) + "/" + pad_view[i + 1] + ".txt")
+                    .then(a => a.text())
+                    .then(a => str_arr[Math.round(i/2)] = a + "。");
+            }
+            document.getElementById('text').innerHTML = str_arr.join("<br />");
+            if(flag)
+            {
+                document.getElementById('text').innerHTML += "<br />======="
+            }
+        }
+
+
+    </script>
+</head>
+
+<body>
+
+    <h2>吟诗一首</h2>
+    <input type="text" id="data" name="data">
+    <button id="btn">Try it</button>
+    <script>
+        document.getElementById("btn").onclick=async ()=>{
+        await btn();
+    }
+    </script>
+    <div id="text"></div>
+
+</body>
+
+</html>
