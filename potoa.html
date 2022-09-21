@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <script>
         var all_data;
-        document.body.onload = function f()
+        async function f()
         {
             document.body.style.visibility = "hidden";
             window.all_data = await (await fetch('map.json')).json();
@@ -21,13 +21,18 @@
             const len = arr.length - (flag ? 1 : 0);
             let data = new Uint8Array(len * 2)
             document.getElementById('text').innerHTML = ""
+            console.log(window.all_data[arr[1]])
+            console.log(arr[1])
             for (var i = 0; i < len; i++) {
                 data[i * 2] = window.all_data[arr[i]] >> 8;
-                data[i * 2 + 1] = window.all_data[arr[i]] & 0x0F;
+                data[i * 2 + 1] = window.all_data[arr[i]] & 0xFF;
             }
+            console.log(data[3])
             if (flag) data = data.slice(0, len * 2 - 1);
             const decoder = new TextDecoder();
             const view = decoder.decode(data);
+            console.log(data)
+            console.log(view)
             document.getElementById('text').innerHTML += view;
         }
     </script>
@@ -39,6 +44,9 @@
     <textarea style="display:block;width:100%" id="data" rows="20"></textarea>
     <button id="btn">Try it</button>
     <script>
+        document.body.onload = async () => {
+            await f();
+        }
         document.getElementById("btn").onclick = async () => {
             await btn();
         }
