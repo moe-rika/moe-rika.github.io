@@ -18,11 +18,10 @@
             }
             let pad_view = concatTypedArrays(view, padarr)
             let str_arr = new Array(Math.round(pad_view.length/2))
+            var all_data = await (await fetch('arr.json')).json();
             document.getElementById('text').innerHTML = ""
             for (var i = 0; i < pad_view.length; i += 2) {
-                await fetch("/data/dic/" + (pad_view[i] >> 4) + "/" + (pad_view[i] & 0xF) + "/" + pad_view[i + 1] + ".txt")
-                    .then(a => a.text())
-                    .then(a => str_arr[Math.round(i/2)] = a + "。");
+                str_arr[Math.round(i/2)] = all_data[i] + "。";
             }
             document.getElementById('text').innerHTML = str_arr.join("<br />");
             if(flag)
