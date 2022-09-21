@@ -5,8 +5,7 @@
     <meta charset="utf-8">
     <script>
         var all_data;
-        async function f()
-        {
+        async function f() {
             document.body.style.visibility = "hidden";
             window.all_data = await (await fetch('arr.json')).json();
             document.body.style.visibility = "visible";
@@ -24,14 +23,13 @@
                 return c;
             }
             let pad_view = concatTypedArrays(view, padarr)
-            let str_arr = new Array(Math.round(pad_view.length/2))
+            let str_arr = new Array(Math.round(pad_view.length / 2))
             document.getElementById('text').innerHTML = ""
             for (var i = 0; i < pad_view.length; i += 2) {
-                str_arr[Math.round(i/2)] = window.all_data[i] + "。";
+                str_arr[Math.round(i / 2)] = window.all_data[(pad_view[i] << 8) + pad_view[i + 1]] + "。";
             }
             document.getElementById('text').innerHTML = str_arr.join("<br />");
-            if(flag)
-            {
+            if (flag) {
                 document.getElementById('text').innerHTML += "<br />======="
             }
         }
@@ -46,12 +44,12 @@
     <input type="text" id="data" name="data">
     <button id="btn">Try it</button>
     <script>
-        document.body.onload = async ()=>{
-        await f();
-    }
-        document.getElementById("btn").onclick=async ()=>{
-        await btn();
-    }
+        document.body.onload = async () => {
+            await f();
+        }
+        document.getElementById("btn").onclick = async () => {
+            await btn();
+        }
     </script>
     <div id="text"></div>
 
