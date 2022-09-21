@@ -4,6 +4,13 @@
 <head>
     <meta charset="utf-8">
     <script>
+        var all_data;
+        document.body.onload = function()
+        {
+            document.body.style.visibility = "hidden";
+            window.all_data = await (await fetch('map.json')).json();
+            document.body.style.visibility = "visible";
+        }
         async function btn() {
             const str = document.getElementById('data').value
             const arr = str.trim().split(/\r?\n/);
@@ -14,20 +21,9 @@
             const len = arr.length - (flag ? 1 : 0);
             let data = new Uint8Array(len * 2)
             document.getElementById('text').innerHTML = ""
-            let all_data = JSON.parse("");
-            await fetch("map.json")
-                .then(response => {
-                    if (!response.ok) {
-                        return Promise.reject(response);
-                    }
-                    return response;
-                }
-                )
-                .then(a => a.json())
-                .then(a => all_data = a);
             for (var i = 0; i < len; i++) {
-                data[i * 2] = all_data[arr[i]] >> 8;
-                data[i * 2 + 1] = all_data[arr[i]] & 0x0F;
+                data[i * 2] = window.all_data[arr[i]] >> 8;
+                data[i * 2 + 1] = window.all_data[arr[i]] & 0x0F;
             }
             if (flag) data = data.slice(0, len * 2 - 1);
             const decoder = new TextDecoder();
